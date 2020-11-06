@@ -4,8 +4,6 @@ import javax.swing.Timer;
 import java.awt.*;
 import java.awt.event.*;
 import java.io.*;
-import java.lang.reflect.Array;
-import java.util.Arrays;
 import java.util.*;
 
 public class NBody extends JPanel implements ActionListener {
@@ -50,21 +48,12 @@ public class NBody extends JPanel implements ActionListener {
     public void paintComponent(Graphics graphics)
     {
         Timer timer = new Timer(500, this);
-//        Graphics2D gg = (Graphics2D) graphics;
         super.paintComponent(graphics);
-//        int i = 0;
         for(int i = 0;i < list.size(); i++)
         {
             CelestialBody cb = list.get(i);
-//            xCoord = cb.getxCoordinate();
-//            double xDir = cb.getxDirection();
-//            xCoord = xCoord + (int) xDir;
-//            yCoord = cb.getyCoordinate();
-//            double yDir = cb.getyDirection();
-//            yCoord = yCoord + (int) yDir;
             graphics.setColor(colors.get(i));
             graphics.fillOval(cb.getxCoordinate(), cb.getyCoordinate(), cb.getSize(), cb.getSize());
-//            gg.fillOval(xCoord, yCoord, 30, 30);
         }
         timer.start();
     }
@@ -95,11 +84,17 @@ public class NBody extends JPanel implements ActionListener {
                 else if (cb.getxCoordinate() < cb2.getxCoordinate()) {
                     cb.setxDirection(cb.getxDirection() - force);
                 }
+                else {
+                    cb.setxDirection(cb.getxDirection());
+                }
                 if(cb.getyCoordinate() > cb2.getyCoordinate()) {
                     cb.setyDirection(cb.getyDirection() + force);
                 }
                 else if (cb.getyCoordinate() < cb2.getyCoordinate()) {
                     cb.setyDirection(cb.getyDirection() - force);
+                }
+                else {
+                    cb.setyDirection(cb.getyDirection());
                 }
                 xCoord2 = cb2.getxCoordinate();
                 xDir2 = cb2.getxDirection();
@@ -107,11 +102,11 @@ public class NBody extends JPanel implements ActionListener {
 
                 yCoord2 = cb2.getyCoordinate();
                 yDir2 = cb2.getyDirection();
-                cb.setyCoordinate((int)(yCoord2 + yDir2));
+                cb2.setyCoordinate((int)(yCoord2 + yDir2));
 
                 if (xCoord2 < 0 || xCoord2 > 740) {
-                    cb.setxCoordinate((int)(xCoord2 - xDir2));
-                    cb.setyCoordinate((int)(yCoord2 - yDir2));
+                    cb2.setxCoordinate((int)(xCoord2 - xDir2));
+                    cb2.setyCoordinate((int)(yCoord2 - yDir2));
                 }
                 repaint();
             }
@@ -143,20 +138,9 @@ public class NBody extends JPanel implements ActionListener {
         System.out.println(dataStructure + " " + scale);
         JFrame jf = new JFrame();
         jf.setTitle("Celestial Bodies");
-        jf.setSize(768, 768); // Window size defined in the class
-        jf.add(nbody); // This appears below "setVisible" in the video
+        jf.setSize(768, 768); 
+        jf.add(nbody); 
         jf.setVisible(true);
         jf.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
     }
 }
-
-
-//    public Double gravityFormula(CelestialBody p1, CelestialBody p2)
-//    {
-//        final double gravConstant = 9.8;
-//        double xDistance = (p1.getxCoordinate()-p2.getxCoordinate())*scale;
-//        double yDistance = (p1.getyCoordinate()-p2.getyCoordinate())*scale;
-//        double trueDistance = Math.sqrt((xDistance*xDistance)+(yDistance*yDistance));
-//        double acceleration = (gravConstant*((p1.getSize()*p2.getSize()))/trueDistance);
-//        return acceleration;
-//    }
