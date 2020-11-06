@@ -58,6 +58,11 @@ public class NBody extends JPanel implements ActionListener {
         timer.start();
     }
 
+    public double distance(double distx, double disty)
+    {
+        return (distx-disty)*scale;
+    }
+
     public void actionPerformed(ActionEvent e) {
         int xCoord, yCoord;
         int xCoord2, yCoord2;
@@ -65,17 +70,17 @@ public class NBody extends JPanel implements ActionListener {
         double xDir2, yDir2;
         double mass1, mass2;
         double distance, force;
-        double gravity = 6.674 * Math.pow(10, -11);
+        double gravity = 6.67408e-11;
         for (int i = 0; i < list.size(); i++) {
             CelestialBody cb = list.get(i);
             mass1 = cb.getMass();
 
-            int j = 0;
-            CelestialBody cb2 = list.get(j);
-            for (j = 1; j < list.size() && i != j; j++) {
-                cb2 = list.get(j);
+            for (int j = 1; j < list.size()-2 && i != j; j++) {
+                CelestialBody cb2 = list.get(j);
                 mass2 = cb2.getMass();
-                distance = Math.sqrt(Math.pow((cb2.getyCoordinate() - cb.getyCoordinate()), 2) + Math.pow((cb2.getxCoordinate() - cb.getxCoordinate()), 2));
+                double xDistance = distance(cb.getxCoordinate(),cb2.getxCoordinate());
+                double yDistance = distance(cb.getyCoordinate(),cb2.getyCoordinate());
+                distance = Math.sqrt(xDistance*xDistance+yDistance*yDistance);
                 force = gravity * (mass1*mass2)/distance;
 
                 if(cb.getxCoordinate() > cb2.getxCoordinate()) {
@@ -138,8 +143,8 @@ public class NBody extends JPanel implements ActionListener {
         System.out.println(dataStructure + " " + scale);
         JFrame jf = new JFrame();
         jf.setTitle("Celestial Bodies");
-        jf.setSize(768, 768); 
-        jf.add(nbody); 
+        jf.setSize(768, 768);
+        jf.add(nbody);
         jf.setVisible(true);
         jf.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
     }
