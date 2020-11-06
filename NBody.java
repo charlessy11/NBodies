@@ -58,77 +58,61 @@ public class NBody extends JPanel implements ActionListener {
         timer.start();
     }
 
-    public double distance(double distx, double disty)
+    public double distance(double xDist, double yDist)
     {
-        return (distx-disty)*scale;
+        return (xDist - yDist) * scale;
+    }
+
+    double gravity = 6.67408e-11;
+    public double gravitationalPull(double mass1, double mass2, double distance)
+    {
+        return gravity * (mass1 * mass2) / (Math.pow(distance, 2));
     }
 
     public void actionPerformed(ActionEvent e) {
-        int xCoord, yCoord;
-        int xCoord2, yCoord2;
-        double xDir, yDir;
-        double xDir2, yDir2;
-        double mass1, mass2;
-        double distance, force;
-        double gravity = 6.67408e-11;
+        double xChangeOfVelocity = 0.0;
+        double yChangeOfVelocity = 0.0;
         for (int i = 0; i < list.size(); i++) {
-            CelestialBody cb = list.get(i);
-            mass1 = cb.getMass();
-
-            for (int j = 1; j < list.size()-2 && i != j; j++) {
+            CelestialBody cb1 = list.get(i);
+            for (int j = 0; j < list.size() && i != j; j++) {
                 CelestialBody cb2 = list.get(j);
-                mass2 = cb2.getMass();
-                double xDistance = distance(cb.getxCoordinate(),cb2.getxCoordinate());
-                double yDistance = distance(cb.getyCoordinate(),cb2.getyCoordinate());
-                distance = Math.sqrt(xDistance*xDistance+yDistance*yDistance);
-                force = gravity * (mass1*mass2)/distance;
-
-                if(cb.getxCoordinate() > cb2.getxCoordinate()) {
-                    cb.setxDirection(cb.getxDirection() + force);
+                double xDistance = distance(cb1.getxCoordinate(),cb2.getxCoordinate());
+                double yDistance = distance(cb1.getyCoordinate(),cb2.getyCoordinate());
+                double distance = Math.sqrt(xDistance * xDistance + yDistance * yDistance);
+                double force = gravitationalPull(cb1.getMass(),cb2.getMass(),distance);
+                double xGravity = force * xDistance / distance;
+                double yGravity = force * yDistance / distance;
+                //check for possible collisions and out of frame movements
+                if(cb1.getxCoordinate() < cb2.getxCoordinate()) {
+                    xChangeOfVelocity -= xGravity;
                 }
-                else if (cb.getxCoordinate() < cb2.getxCoordinate()) {
-                    cb.setxDirection(cb.getxDirection() - force);
-                }
-                else {
-                    cb.setxDirection(cb.getxDirection());
-                }
-                if(cb.getyCoordinate() > cb2.getyCoordinate()) {
-                    cb.setyDirection(cb.getyDirection() + force);
-                }
-                else if (cb.getyCoordinate() < cb2.getyCoordinate()) {
-                    cb.setyDirection(cb.getyDirection() - force);
+                else if(cb1.getxCoordinate() > cb2.getxCoordinate()) {
+                    xChangeOfVelocity += xGravity;
                 }
                 else {
-                    cb.setyDirection(cb.getyDirection());
+                    xChangeOfVelocity = 0.0;
                 }
-                xCoord2 = cb2.getxCoordinate();
-                xDir2 = cb2.getxDirection();
-                cb2.setxCoordinate((int)(xCoord2 + xDir2));
-
-                yCoord2 = cb2.getyCoordinate();
-                yDir2 = cb2.getyDirection();
-                cb2.setyCoordinate((int)(yCoord2 + yDir2));
-
-                if (xCoord2 < 0 || xCoord2 > 740) {
-                    cb2.setxCoordinate((int)(xCoord2 - xDir2));
-                    cb2.setyCoordinate((int)(yCoord2 - yDir2));
+                if(cb1.getyCoordinate()-cb2.getyCoordinate() == 0)
+                {
+                    yGravity = 0.0;
                 }
-                repaint();
+                if(cb1.getyCoordinate() < cb2.getyCoordinate()) {
+                    yChangeOfVelocity -= yGravity;
+                }
+                else if(cb1.getyCoordinate() > cb2.getyCoordinate()) {
+                    yChangeOfVelocity += yGravity;
+                }
+                else {
+                    yChangeOfVelocity = 0.0;
+                }
             }
-            xCoord = cb.getxCoordinate();
-            xDir = cb.getxDirection();
-            cb.setxCoordinate((int)(xCoord + xDir));
-
-            yCoord = cb.getyCoordinate();
-            yDir = cb.getyDirection();
-            cb.setyCoordinate((int)(yCoord + yDir));
-
-            if (xCoord < 0 || xCoord > 740) {
-                cb.setxCoordinate((int)(xCoord - xDir));
-                cb.setyCoordinate((int)(yCoord - yDir));
-            }
-            repaint();
+            //update the celestial bodies' velocity
+            cb1.setxDirection(cb1.getxDirection() + xChangeOfVelocity / scale / cb1.getMass());
+            cb1.setyDirection(cb1.getyDirection() + yChangeOfVelocity / scale / cb1.getMass());
+            cb1.setxCoordinate((int) (cb1.getxCoordinate() + cb1.getxDirection()));
+            cb1.setyCoordinate((int) (cb1.getyCoordinate() + cb1.getyDirection()));
         }
+        repaint();
     }
 
     public static void main (String[] args) {
