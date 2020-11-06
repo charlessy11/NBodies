@@ -13,7 +13,7 @@ public class NBody extends JPanel implements ActionListener {
     private static List<CelestialBody> list;
     private Random randColor;
     private static ArrayList<Color> colors= new ArrayList<>();
-
+    //Read the data from input file
     public void readFile(File file) throws Exception{
         //create buffered reader
         BufferedReader br = new BufferedReader(new FileReader(file));
@@ -44,7 +44,7 @@ public class NBody extends JPanel implements ActionListener {
         }
         System.out.println(list.toString());
     }
-
+    //Set random colors to the celestial bodies
     public void paintComponent(Graphics graphics)
     {
         Timer timer = new Timer(500, this);
@@ -57,18 +57,19 @@ public class NBody extends JPanel implements ActionListener {
         }
         timer.start();
     }
-
+    //Calculate distance
     public double distance(double xDist, double yDist)
     {
         return (xDist - yDist) * scale;
     }
 
     double gravity = 6.67408e-11;
+    //Calculate force of gravity between 2 celestial bodies with respect to their distance
     public double gravitationalPull(double mass1, double mass2, double distance)
     {
         return gravity * (mass1 * mass2) / (Math.pow(distance, 2));
     }
-
+    //change positions of celestial bodies, factoring in outside forces
     public void actionPerformed(ActionEvent e) {
         double xChangeOfVelocity = 0.0;
         double yChangeOfVelocity = 0.0;
@@ -114,7 +115,7 @@ public class NBody extends JPanel implements ActionListener {
         }
         repaint();
     }
-
+    //Main
     public static void main (String[] args) {
         File file = new File("nbody_input.txt");
         NBody nbody = new NBody();
